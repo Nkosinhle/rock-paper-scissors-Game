@@ -6,6 +6,57 @@ let score = JSON.parse(localStorage.getItem('score')) || {
 
 updateScoreElement();
 
+let isAutoPlay = false;
+let intervalId;
+
+function autoPlay(){
+  if(!isAutoPlay){
+   
+    intervalId = setInterval(() =>{
+      const playerMove = pickComputerMove();
+      playGame(playerMove);
+    }, 1000);
+    isAutoPlay = true;
+
+    document.querySelector('.js-auto-play-button').innerHTML = 'Stop Playing';
+
+  }else{
+    clearInterval(intervalId);
+    isAutoPlay = false;
+    document.querySelector('.js-auto-play-button').innerHTML = 'Auto Play';
+  }
+}
+
+document.querySelector('.js-rock-button').addEventListener('click', () =>{
+  playGame('rock');
+})
+
+document.querySelector('.js-paper-button').addEventListener('click', () =>{
+  playGame('paper');
+})
+
+document.querySelector('.js-scissors-button').addEventListener('click', () =>{
+  playGame('scissors');
+})
+
+document.body.addEventListener('keydown', (event) =>{
+  if(event.key === 'r'){
+    playGame('rock');
+  } else if(event.key === 'p'){
+    playGame('paper');
+  }else if(event.key === 's'){
+    playGame('scissors')
+  }else if(event.key === 'a'){
+    autoPlay();
+  }else if(event.key=== 'Backspace'){
+    showResetConfirmation();
+  }
+});
+
+document.querySelector('.js-auto-play-button').addEventListener('click', ()=> {
+  autoPlay();
+});
+
 function playGame(playerMove) {
   const computerMove = pickComputerMove();
 
@@ -57,9 +108,47 @@ function playGame(playerMove) {
   `You <img class="move-image" src="images/${playerMove}-emoji.png">
   <img class="move-image" src="images/${computerMove}-emoji.png">
   Computer`;
+};
+
+document.querySelector('.js-reset-score-button').addEventListener('click', () =>{
+  showResetConfirmation();
+});
+
+function showResetConfirmation(){
+  document.querySelector('.js-reset-confirmation').innerHTML =`Are you sure you want to reset the score?
+  <button class ="js-reset-yes
+  ">Yes</button>
+  <button class = "js-reset-no
+  ">No</button>
+  `;
+
+
+document.querySelector('.js-reset-yes').addEventListener('click', () =>{
+  resetScore();
+  hideReset();
+});
+
+document.querySelector('.js-reset-no').addEventListener('click', () =>{
+  hideReset();
+})
 }
-  
-  
+
+function hideReset(){
+  document.querySelector('.js-reset-confirmation').innerHTML = '';
+}
+
+function resetScore(){
+  score.wins = 0;
+  score.losses = 0;
+  score.ties = 0;
+  localStorage.removeItem('score');
+  updateScoreElement();
+}
+
+document.querySelector('.js-reset-score-button').addEventListener('click', ()=>{
+  showResetConfirmation();
+})
+
 function updateScoreElement(){
   document.querySelector('.js-score')
     .innerHTML = `Wins: ${score.wins}, Losses: ${score.losses}, Ties: ${score.ties}`;
